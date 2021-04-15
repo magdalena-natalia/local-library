@@ -53,7 +53,9 @@ ROOT_URLCONF = 'locallibrary.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        # TODO ??? To mam wyrzucić?
+        # 'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates/django_authentication'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -105,9 +107,18 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
+# TODO Dlaczego to nie działa?
+#  Change the date display from default 'N j, Y' (Feb. 4, 2003 to 04.02.2003)
+# Not working so changed in author_detail.html
+DATE_FORMAT = '%d.%m.%Y'
+
+USE_I18N = True
+USE_L10N = False
+USE_TZ = True
+
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Europe/Warsaw'
+TIME_ZONE = 'Atlantic/Reykjavik'
 
 USE_I18N = True
 

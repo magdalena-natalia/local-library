@@ -1,11 +1,9 @@
 import uuid
-from datetime import datetime
+from datetime import date
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
-
-
 
 
 class Genre(models.Model):
@@ -61,7 +59,7 @@ class Book(models.Model):
         # null=True,
     )
     # ?
-    today = datetime.today()
+    today = date.today()
     curr_year = today.year
 
     first_published = models.IntegerField(
@@ -117,6 +115,7 @@ class BookInstance(models.Model):
         null=True,
         blank=True,
         verbose_name='Pożyczający')
+
     # ? Dlaczego akutrat krotka?
     LOAN_STATUS = (
         ('m', 'W trakcie renowacji'),  # m - maintenance
@@ -135,6 +134,13 @@ class BookInstance(models.Model):
     class Meta:
         # ? poproszę o wiecej info na temat klasy w klasie
         ordering = ['due_back']
+        permissions = (("can_mark_returned", "Can set book as returned"),)
+
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
 
     def __str__(self):
         return f'{self.id} ({self.book.title})'
@@ -156,7 +162,7 @@ class Author(models.Model):
         help_text='Wprowadz imiona autora (bez dodatkowych znakow pomiedzy)',
         verbose_name='Imiona')
 
-    birthyear = models.DateField(
+    date_of_birth = models.DateField(
         # TODO napisze funkcje sprawdzajaca czy data urodzenia autora była przynajmniej 7 lat temu
         # TODO nadpiszę wiadomość błędu, jak to zrobic bez pisania validatora?
         # validators=[],
@@ -165,7 +171,7 @@ class Author(models.Model):
         blank=True,
         null=True)
 
-    death_year = models.DateField(
+    date_of_death = models.DateField(
         # TODO napisze funkcje sprawdzajaca czy data smierci autora nie przypada po dzisiejszej
         # validators=[],
         help_text='Wprowadz date smierci autora w formacie RRRR-MM-DD',

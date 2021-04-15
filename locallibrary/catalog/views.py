@@ -1,6 +1,8 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render
 from django.views import generic
 from catalog.models import Author, Book, BookInstance, Genre
+
 
 def index(request):
     num_books = Book.objects.all().count()
@@ -25,23 +27,21 @@ def index(request):
     # Przekazywanie do wzorca html danych przy pomocy zmiennej context
     return render(request, 'index.html', context=context)
 
+
 class BookListView(generic.ListView):
     model = Book
     template_name = 'book_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # TODO ? dlaczego tu sie nic nie wyswietla???
         context['all_list'] = Book.objects.all()
         return context
 
-    # # TODO
     def get_queryset(self):
         """Overwriting the method which in default returns the list of all the particular model's objects"""
         qs = super().get_queryset()
         return qs.order_by('id').reverse()[:5]
         # order_by -'id'
-
 
         # return reversed(qs) # brak ksiazek w bibliotece
     #     #     # kiedy powinnam używać super w get_queryset?
@@ -50,16 +50,17 @@ class BookListView(generic.ListView):
     # TODO nie umiem też wywołać get_queryset
 
 
-
-
 class BookDetailView(generic.DetailView):
     model = Book
     template_name = 'book_detail.html'
+
 
 class AuthorListView(generic.ListView):
     model = Author
     template_name = 'author_list.html'
     paginate_by = 50
+
+
 #     jak przechodzi się do następnych stron
 
 class AuthorDetailView(generic.DetailView):
@@ -67,4 +68,25 @@ class AuthorDetailView(generic.DetailView):
     template_name = "author_detail.html"
 
 
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'bookinstance_list_loaned_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+
+class AllLoanedBooksByUsersListView(PermissionRequiredMixin, LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'bookinstance_list_loaned.html'
+    permission_required = 'catalog.can_mark_returned'
+    paginate_by = 30
+
+    def get_queryset(self):
+        # qs = super().get_queryset()
+        # return qs.order_by('due_back')
+        #TODO czy rozwiazanie z przykladowych rozwiazan jest lepsze i dlaczego
+        # return super().get_queryset().filter(status__exact='o').order_by('due_back')
+        return BookInstance.objects.all().filter(status__exact='o').order_by('due_back')
 

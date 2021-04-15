@@ -27,8 +27,8 @@ class AuthorInline(admin.TabularInline):
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     # dodam wyswietlanie ksiazek autora
-    list_display = ('surname', 'names', 'birthyear', 'death_year')
-    fields = ('surname', 'names', 'birthyear', 'death_year', 'bio')
+    list_display = ('surname', 'names', 'date_of_birth', 'date_of_death')
+    fields = ('surname', 'names', 'date_of_birth', 'date_of_death', 'bio')
     inlines = [RoleInline]
 
 

@@ -1,11 +1,20 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<h1>Tytuł: {{ book.title }}</h1>
+<h1>{{ book.title }}</h1>
 {% comment %}
-dlaczego tak wygląda join, a nie pythonowo? czemu |?
+TODO dodaj przecinki
 {% endcomment %}
-<p><strong>Autor:</strong> <a href="{{ book.author.get_absolute_url }}">{{ book.author.all|join:"; " }}</a></p>
+<p><strong>Autor:</strong>
+
+{% for writer in book.author.all %}
+<a href="{{ writer.get_absolute_url}}">{{writer}}</a>
+    {% if writer != book.author.last %}
+    |
+    {% endif %}
+{% endfor %}
+</p>
+
 <p><strong>Opis:</strong> {{ book.summary }}</p>
 <p><strong>ISBN:</strong> {{ book.isbn }}</p>
 <p><strong>Rok pierwszego wydania:</strong> {{ book.first_published }}</p>
