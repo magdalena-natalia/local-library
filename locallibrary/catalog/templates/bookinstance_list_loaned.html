@@ -7,10 +7,10 @@
 <table>
     <tr>
         <th>Tytuł</th>
-        <th>Wypożyczający</th>
-        <th>Data ważności</th>
-        <th>Możliwość przedłużenia</th>
-        <th>Zatwierdzenie oddania</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;Wypożyczający</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;Data ważności</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;Możliwość przedłużenia</th>
+        <th>&nbsp;&nbsp;&nbsp;&nbsp;Zatwierdzenie oddania</th>
     </tr>
 
     {% for bookinstance in bookinstance_list %}
@@ -19,17 +19,17 @@
             <a href="{% url 'book_detail' bookinstance.book.pk %}" class="font-weight-bold">{{bookinstance.book.title}}</a>
         </td>
         <td>
-            {{ bookinstance.borrower }}
+            &nbsp;&nbsp;&nbsp;&nbsp;{{ bookinstance.borrower }}
         </td>
         <td>
             <span class="{% if bookinstance.is_overdue %}text-danger{% endif %}">
-                {{ bookinstance.due_back|date:'d. m. Y' }} </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;{{ bookinstance.due_back|date:'d. m. Y' }} </span>
         </td>
         <td>
-            {% if not bookinstance.prolonged %}<a href="{% url 'renew_book' bookinstance.id %}">Przedłuż</a>{% else %}Brak możliwości{% endif %}
+            &nbsp;&nbsp;&nbsp;&nbsp;{% if not bookinstance.prolonged %}<a href="{% url 'renew_book' bookinstance.id %}">Przedłuż</a>{% else %}Brak możliwości{% endif %}
         </td>
         <td>
-            <a href="{% url 'return_book' bookinstance.id%}">Zatwierdź</a>
+            &nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'return_book' bookinstance.id%}">Zatwierdź</a>
         </td>
     </tr>
     {% endfor %}

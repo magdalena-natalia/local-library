@@ -18,7 +18,7 @@ class RenewBookForm(forms.Form):
         return renew_date
 
 
-class BookInstanceChangeStatusForm(forms.ModelForm):
+class BookInstanceReturnForm(forms.ModelForm):
     class Meta:
         model = BookInstance
         fields = ['status']
@@ -28,6 +28,9 @@ class BookInstanceChangeStatusForm(forms.ModelForm):
         userless_choices = [('m', 'W trakcie renowacji'), ('a', 'Dostępna')]
         self.fields['status'].choices = userless_choices
 
-    # def clean_status(self):
-    #     status = self.cleaned_data.get('status')
-    #     return status
+        # if the form submitted and the model instance exists,
+        # clean the book instance borrower in the database
+        if self.is_bound and self.instance.pk:
+            self.instance.borrower = None
+            self.instance.save()
+

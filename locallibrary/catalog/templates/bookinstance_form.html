@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>Kopia książki</h1>
+{% if bookinstance.book.title %} <h2><a href="{% url 'book_detail' bookinstance.book.id %}" class="link-primary">{{bookinstance.book.title}}</a></h2>{% endif %}
+{% if bookinstance.id %}<h3>{{bookinstance.id}}</h3>{% endif %}
 <form action="" method="post">
     {% csrf_token %}
     <table>

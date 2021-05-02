@@ -7,7 +7,7 @@ from django.urls import reverse, reverse_lazy
 # TODO czy często się robi tak jak w 2 poniższych liniach (podwójny import)?
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from catalog.forms import RenewBookForm, BookInstanceChangeStatusForm
+from catalog.forms import RenewBookForm, BookInstanceReturnForm
 from catalog.models import Author, Book, BookInstance, Genre
 
 
@@ -166,13 +166,13 @@ class BookInstanceStatusUpdate(PermissionRequiredMixin, LoginRequiredMixin, Upda
     permission_required = 'catalog.can_mark_returned'
     template_name = 'bookinstance_form.html'
     model = BookInstance
-    fields = '__all__'
+    form_class = BookInstanceReturnForm
+    success_url = reverse_lazy('all_borrowed')
 
-    # form_class = BookInstanceChangeStatusForm
-
-    def get_success_url(self):
-        book_pk = self.kwargs.get("book_pk")
-        if book_pk:
-            return reverse_lazy('book-detail', kwargs={'pk': book_pk})
-        else:
-            return reverse_lazy('all-borrowed-to-return')
+    #
+    # def get_success_url(self):
+    #     book_pk = self.kwargs.get("book_pk")
+    #     if book_pk:
+    #         return reverse_lazy('book-detail', kwargs={'pk': book_pk})
+    #     else:
+    #         return reverse_lazy('all-borrowed-to-return')
