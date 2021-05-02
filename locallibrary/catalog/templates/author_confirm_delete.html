@@ -1,0 +1,12 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Usuwanie autora</h1>
+<p>Autor: <strong>{{ author }}</strong> został przeznaczony do usunięcia.
+    <br>
+    Czy na pewno usunąć autora?</p>
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Tak, usuń.">
+</form>
+{% endblock %}

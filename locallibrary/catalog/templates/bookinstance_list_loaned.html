@@ -1,19 +1,41 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Przedłuż wypożyczone książki</h1>
+<h1>Wypożyczone książki</h1>
 
-    {% if bookinstance_list %}
-    <ul>
+{% if bookinstance_list %}
+<table>
+    <tr>
+        <th>Tytuł</th>
+        <th>Wypożyczający</th>
+        <th>Data ważności</th>
+        <th>Możliwość przedłużenia</th>
+        <th>Zatwierdzenie oddania</th>
+    </tr>
 
-      {% for bookinst in bookinstance_list %}
-      <li class="{% if bookinst.is_overdue %}text-danger{% endif %}">
-        <a href="{% url 'book_detail' bookinst.book.pk %}">{{bookinst.book.title}}</a> ({{ bookinst.due_back }}) - {{ bookinst.borrower }}
-      </li>
-      {% endfor %}
-    </ul>
+    {% for bookinstance in bookinstance_list %}
+    <tr>
+        <td>
+            <a href="{% url 'book_detail' bookinstance.book.pk %}" class="font-weight-bold">{{bookinstance.book.title}}</a>
+        </td>
+        <td>
+            {{ bookinstance.borrower }}
+        </td>
+        <td>
+            <span class="{% if bookinstance.is_overdue %}text-danger{% endif %}">
+                {{ bookinstance.due_back|date:'d. m. Y' }} </span>
+        </td>
+        <td>
+            {% if not bookinstance.prolonged %}<a href="{% url 'renew_book' bookinstance.id %}">Przedłuż</a>{% else %}Brak możliwości{% endif %}
+        </td>
+        <td>
+            <a href="{% url 'return_book' bookinstance.id%}">Zatwierdź</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
-    {% else %}
-      <p>Brak wypożyczonych książek.</p>
-    {% endif %}
+{% else %}
+<p>Brak wypożyczonych książek.</p>
+{% endif %}
 {% endblock %}

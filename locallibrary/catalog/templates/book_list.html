@@ -1,32 +1,23 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>Lista książek</h1>
-
-  <h2>Nowości</h2>
-  <ul>
-      {% for book in book_list %}
-      <li>
-          <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{ book.author.all|join:", " }})
-      </li>
-      {% endfor %}
-  </ul>
-
-  <h2>Pełen katalog</h2>
-  {% if book_list %}
-  <ul>
-    {% for book in all_list %}
-      <li>
-        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{ book.author.all|join:" | " }})
-      </li>
+<h1>Wszystkie książki</h1>
+{% if book_list %}
+<ul>
+    {% for book in book_list %}
+    <li>
+        <a href="{{ book.get_absolute_url }}" class="font-weight-bold">{{ book.title }}</a> ({{ book.author.all|join:", " }})
+    {% if perms.catalog.change_book %}
+        <a href="{% url 'book_update' book.id %}">(Edytuj)</a>
+    {% endif %}
+    {% if perms.catalog.delete_book %}
+        <a href="{% url 'book_delete' book.id %}">(Usuń)</a>
+    {% endif %}
+    </li>
     {% endfor %}
-  </ul>
-
-
-
-  {% else %}
-    <p>Brak książek w bibliotece.</p>
-  {% endif %}
+</ul>
+{% else %}
+<p>Brak książek w bibliotece.</p>
+{% endif %}
 {% endblock %}
-
 

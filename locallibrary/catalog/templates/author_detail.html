@@ -4,36 +4,35 @@
 <h1>{{ author.names }} {{author.surname}}</h1>
 <p><strong>Data urodzenia: </strong>{{author.date_of_birth|date:'d. m. Y'}}</p>
 <p><strong>Data śmierci: </strong>{{author.date_of_death|date:'d. m. Y'}}</p>
-    {% comment %}
+{% comment %}
 TODO: wyłuskam gatunki wszystkich książek
+w widokach, nie w html, staromodne
 <p><strong>Gatunki: </strong>{{author.book_set.values('genre').annotate(Count("id")).order_by()}}</p>
 <p><strong>Gatunki: </strong>{{author.select_related('genre').all()}}</p>
-    {% endcomment %}
-<p class="text-primary">{{author.bio}}</p>
-<div style="margin-left:20px;margin-top:20px">
+{% endcomment %}
+<p>{{author.bio}}</p>
+<div style="margin-top:20px">
     <h2>Książki</h2>
     {% for book in author.book_set.all %}
     <hr>
-    <strong>
-    <a href="{{ book.get_absolute_url}}">{{ book.title }}</a>
-    </strong>
+    <h3><a href="{{ book.get_absolute_url}}">{{ book.title }}</a>
+    </h3>
 
-    <p>Liczba egzemplarzy: <span class="{% if book.bookinstance_set.all.count > 0 %}text-success{% else %}text-danger{% endif %}">{{ book.bookinstance_set.all.count}}</span>
-
-    {% comment %}
-        dlaczego to nie działa???
+    <p>Liczba egzemplarzy: <span
+            class="{% if book.bookinstance_set.all.count > 0 %}text-success{% else %}text-danger{% endif %}">{{ book.bookinstance_set.all.count}}</span>
+        {% comment %}
+        TODO Czemu to nie działa???
         <br>
-    Liczba dostępnych egzemplarzy:  {{ book.bookinstance_set.filter(status_exact="a").count}}
-    {% endcomment %}
+        Liczba dostępnych egzemplarzy: {{ book.bookinstance_set.objects.filter(status__exact='a').count}}
+        {% endcomment %}
     </p>
     <p>Gatunek: {{book.genre.all|join:", "}} <br>
-    Rok pierwszego wydania: {{book.first_published}}</p>
+        Rok pierwszego wydania: {{book.first_published}}</p>
     <p>{{ book.summary}}</p>
     {% endfor %}
 
 
 </div>
-
 
 
 {% endblock %}

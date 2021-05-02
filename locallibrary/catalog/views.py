@@ -1,6 +1,13 @@
+from datetime import date, timedelta
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse, reverse_lazy
+# TODO czy często się robi tak jak w 2 poniższych liniach (podwójny import)?
 from django.views import generic
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from catalog.forms import RenewBookForm, BookInstanceChangeStatusForm
 from catalog.models import Author, Book, BookInstance, Genre
 
 
@@ -32,15 +39,15 @@ class BookListView(generic.ListView):
     model = Book
     template_name = 'book_list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['all_list'] = Book.objects.all()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['all_list'] = Book.objects.all()
+    #     return context
 
     def get_queryset(self):
         """Overwriting the method which in default returns the list of all the particular model's objects"""
         qs = super().get_queryset()
-        return qs.order_by('id').reverse()[:5]
+        return qs.order_by('id').reverse()
         # order_by -'id'
 
         # return reversed(qs) # brak ksiazek w bibliotece
@@ -86,7 +93,86 @@ class AllLoanedBooksByUsersListView(PermissionRequiredMixin, LoginRequiredMixin,
     def get_queryset(self):
         # qs = super().get_queryset()
         # return qs.order_by('due_back')
-        #TODO czy rozwiazanie z przykladowych rozwiazan jest lepsze i dlaczego
+        # TODO czy rozwiazanie z przykladowych rozwiazan jest lepsze i dlaczego
         # return super().get_queryset().filter(status__exact='o').order_by('due_back')
         return BookInstance.objects.all().filter(status__exact='o').order_by('due_back')
 
+
+@permission_required('catalog.can_mark_returned')
+def renew_book(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+    if request.method == 'POST':
+        form = RenewBookForm(request.POST)
+        if form.is_valid():
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.prolonged = True
+            book_instance.save()
+            return HttpResponseRedirect(reverse('all_borrowed'))
+    else:
+        proposed_renewal_date = date.today() + timedelta(days=30)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+    return render(request, 'book_renew.html', context)
+
+
+class AuthorCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'catalog.add_author'
+    template_name = 'author_form.html'
+    model = Author
+    fields = '__all__'
+    success_url = reverse_lazy('authors')
+
+
+class AuthorUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'catalog.change_author'
+    template_name = 'author_form.html'
+    model = Author
+    fields = '__all__'
+    # success_url = reverse_lazy('authors')
+
+
+class AuthorDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'catalog.delete_author'
+    template_name = 'author_confirm_delete.html'
+    model = Author
+    success_url = reverse_lazy('authors')
+
+
+class BookCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'catalog.add_book'
+    template_name = 'book_form.html'
+    model = Book
+    fields = '__all__'
+
+
+class BookUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'catalog.change_book'
+    template_name = 'book_form.html'
+    model = Book
+    fields = '__all__'
+
+
+class BookDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = "catalog.delete_book"
+    template_name = 'book_confirm_delete.html'
+    model = Book
+    success_url = reverse_lazy('books')
+
+
+class BookInstanceStatusUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'catalog.can_mark_returned'
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+    fields = '__all__'
+
+    # form_class = BookInstanceChangeStatusForm
+
+    def get_success_url(self):
+        book_pk = self.kwargs.get("book_pk")
+        if book_pk:
+            return reverse_lazy('book-detail', kwargs={'pk': book_pk})
+        else:
+            return reverse_lazy('all-borrowed-to-return')

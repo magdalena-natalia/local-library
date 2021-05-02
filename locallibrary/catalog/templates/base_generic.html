@@ -32,17 +32,17 @@
         <ul class="list-unstyled components mb-5">
             <li>
                 {% comment %} empty spans for icons {% endcomment %}
-                <a href="{% url 'index' %}"><span class="fa fa-home mr-3"></span> Strona główna</a>
+                <a href="{% url 'index' %}"><span class="fa fa-home mr-3"></span>Strona główna</a>
             </li>
             <li>
-                <a href="{% url 'books' %}"><span class="fa fa-book mr-3 "></span> Wszystkie książki</a>
+                <a href="{% url 'books' %}"><span class="fa fa-book mr-3 "></span>Wszystkie książki</a>
             </li>
             <li>
                 <a href="{% url 'authors' %}"><span class="fa fa-user mr-3"></span>Wszyscy autorzy</a>
             </li>
             {% if user.is_authenticated %}
             <li>
-                <a href="{% url 'my_borrowed'%}"><span class="fa fa-trophy mr-3 notif"></span>Moje wypożyczone
+                <a href="{% url 'my_borrowed'%}"><span class="fa fa-hourglass mr-3 notif"></span>Moje wypożyczone
                     książki</a>
             </li>
             <li>
@@ -52,8 +52,14 @@
                 <li class="text-center py-3">Opcje dla personelu
                 </li>
                 <li>
-                    <a href="{% url 'all_borrowed'%}"><span class="fa fa-book mr-3"></span></span>Wypożyczone
+                    <a href="{% url 'all_borrowed'%}"><span class="fa fa-hourglass mr-3"></span>Wypożyczone
                     książki</a>
+                </li>
+                <li>
+                    <a href="{% url 'author_create' %}"><span class="fa fa-user mr-3"></span>Dodaj autora</a>
+                </li>
+                <li>
+                    <a href="{% url 'book_create' %}"><span class="fa fa-book mr-3 "></span>Dodaj książkę </a>
                 </li>
                 {% endif %}
             {% else %}

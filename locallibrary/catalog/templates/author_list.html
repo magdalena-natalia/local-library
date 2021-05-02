@@ -6,7 +6,13 @@
 <ul>
     {% for author in author_list %}
     <li>
-        <a href="{{ author.get_absolute_url}}">{{ author.surname }}, {{ author.names }}</a>
+        <a href="{{ author.get_absolute_url}}" class="font-weight-bold">{{ author.surname }}, {{ author.names }}</a>
+        {% if perms.catalog.change_author %}
+        <a href="{% url 'author_update' author.id %}">(Edytuj)</a>
+        {% endif %}
+        {% if perms.catalog.delete_author %}
+        <a href="{% url 'author_delete' author.id %}">(Usuń)</a>
+        {% endif %}
     </li>
     {% endfor %}
 </ul>

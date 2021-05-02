@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Usuwanie autora</h1>
+<p>Książka <strong>{{ book }}</strong> została przeznaczona do usunięcia.
+    <br>
+    Czy na pewno usunąć książkę?</p>
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Tak, usuń.">
+</form>
+
+{% endblock %}

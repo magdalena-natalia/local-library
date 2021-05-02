@@ -130,11 +130,12 @@ class BookInstance(models.Model):
         default='a',
         help_text='Dostepnosc ksiazki',
     )
+    prolonged = models.BooleanField(default=False)
 
     class Meta:
         # ? poproszę o wiecej info na temat klasy w klasie
         ordering = ['due_back']
-        permissions = (("can_mark_returned", "Can set book as returned"),)
+        permissions = (('can_mark_returned', 'Can set book as returned'),)
 
     @property
     def is_overdue(self):
