@@ -101,6 +101,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Redirection when login successful
 LOGIN_REDIRECT_URL = '/'
 
+# The expiration date of activation link
+ACCOUNT_ACTIVATION_DAYS = 7
+
 # Email simulation
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

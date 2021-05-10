@@ -1,0 +1,7 @@
+Cześć, {{ user }}!
+
+Aby dokończyć rejestrację, kliknij w poniższy link aktywacyjny w ciągu {{expiration_days}} dni.
+{{ scheme }}://{{ site }}{% url 'django_registration_activate' activation_key %}
+
+
+Jeżeli nie zakładałeś nowego konta z powyższą nazwą użytkownika, zignoruj tę wiadomość.

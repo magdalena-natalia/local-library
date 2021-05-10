@@ -48,27 +48,29 @@
             <li>
                 <a href="{% url 'logout'%}?next{{request.path}}"><span class="fa fa-sign-out mr-3"></span>Wyloguj</a>
             </li>
-                {% if perms.catalog.can_mark_returned %}
-                <li class="text-center py-3">Opcje dla personelu
-                </li>
-                <li>
-                    <a href="{% url 'all_borrowed'%}"><span class="fa fa-hourglass mr-3"></span>Wypożyczone
+            {% if perms.catalog.can_mark_returned %}
+            <li class="text-center py-3">Opcje dla personelu
+            </li>
+            <li>
+                <a href="{% url 'all_borrowed'%}"><span class="fa fa-hourglass mr-3"></span>Wypożyczone
                     książki</a>
-                </li>
-                <li>
-                    <a href="{% url 'author_create' %}"><span class="fa fa-user mr-3"></span>Dodaj autora</a>
-                </li>
-                <li>
-                    <a href="{% url 'book_create' %}"><span class="fa fa-book mr-3 "></span>Dodaj książkę </a>
-                </li>
-                {% endif %}
+            </li>
+            <li>
+                <a href="{% url 'author_create' %}"><span class="fa fa-user mr-3"></span>Dodaj autora</a>
+            </li>
+            <li>
+                <a href="{% url 'book_create' %}"><span class="fa fa-book mr-3 "></span>Dodaj książkę </a>
+            </li>
+            {% endif %}
             {% else %}
             <li>
                 <a href="{% url 'login'%}?next{{request.path}}"><span class="fa fa-sign-in mr-3"></span>Zaloguj</a>
             </li>
-                {% endif %}
+            <li>
+                <a href="{% url 'django_registration_register'%}"><span class="fa fa-heart mr-3"></span>Zarejestruj</a>
+            </li>
+            {% endif %}
 
-            <hr>
         </ul>
     </nav>
     {% endblock %}
@@ -77,12 +79,34 @@
     <div id="content" class="p-4 p-md-5 pt-5">
         {% block content %}{% endblock %}
     </div>
-    </div>
 
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/popper.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
+    <div>
+        {% block pagination %}
+        {% if is_paginated %}
+        <div class="pagination">
+                    <span class="page-links">
+                        {% if page_obj.has_previous %}
+                            <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Poprzednia strona</a>
+                        {% endif %}
+                        <span class="page-current">
+                            Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}.
+                        </span>
+                        {% if page_obj.has_next %}
+                            <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Następna strona</a>
+                        {% endif %}
+                    </span>
+        </div>
+        {% endif %}
+        {% endblock %}
+    </div>
+</div>
+
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 
 </body>
 </html>

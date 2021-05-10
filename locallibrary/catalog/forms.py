@@ -25,12 +25,12 @@ class BookInstanceReturnForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        userless_choices = [('m', 'W trakcie renowacji'), ('a', 'Dostępna')]
+        userless_choices = [('a', 'Dostępna'), ('m', 'W trakcie renowacji')]
         self.fields['status'].choices = userless_choices
+        # self.fields['status'].default = 'a'
 
         # if the form submitted and the model instance exists,
         # clean the book instance borrower in the database
         if self.is_bound and self.instance.pk:
             self.instance.borrower = None
             self.instance.save()
-

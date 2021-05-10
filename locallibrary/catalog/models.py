@@ -128,7 +128,7 @@ class BookInstance(models.Model):
         choices=LOAN_STATUS,
         blank=True,
         default='a',
-        help_text='Dostepnosc ksiazki',
+        verbose_name='Dostępność książki',
     )
     prolonged = models.BooleanField(default=False)
 

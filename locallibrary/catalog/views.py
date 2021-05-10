@@ -38,6 +38,7 @@ def index(request):
 class BookListView(generic.ListView):
     model = Book
     template_name = 'book_list.html'
+    paginate_by = 10
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -65,7 +66,7 @@ class BookDetailView(generic.DetailView):
 class AuthorListView(generic.ListView):
     model = Author
     template_name = 'author_list.html'
-    paginate_by = 50
+    paginate_by = 10
 
 
 #     jak przechodzi się do następnych stron
@@ -88,13 +89,9 @@ class AllLoanedBooksByUsersListView(PermissionRequiredMixin, LoginRequiredMixin,
     model = BookInstance
     template_name = 'bookinstance_list_loaned.html'
     permission_required = 'catalog.can_mark_returned'
-    paginate_by = 30
+    paginate_by = 10
 
     def get_queryset(self):
-        # qs = super().get_queryset()
-        # return qs.order_by('due_back')
-        # TODO czy rozwiazanie z przykladowych rozwiazan jest lepsze i dlaczego
-        # return super().get_queryset().filter(status__exact='o').order_by('due_back')
         return BookInstance.objects.all().filter(status__exact='o').order_by('due_back')
 
 
@@ -162,17 +159,11 @@ class BookDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('books')
 
 
-class BookInstanceStatusUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+class BookInstanceReturn(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
     permission_required = 'catalog.can_mark_returned'
     template_name = 'bookinstance_form.html'
     model = BookInstance
     form_class = BookInstanceReturnForm
     success_url = reverse_lazy('all_borrowed')
 
-    #
-    # def get_success_url(self):
-    #     book_pk = self.kwargs.get("book_pk")
-    #     if book_pk:
-    #         return reverse_lazy('book-detail', kwargs={'pk': book_pk})
-    #     else:
-    #         return reverse_lazy('all-borrowed-to-return')
+
