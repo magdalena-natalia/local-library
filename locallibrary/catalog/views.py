@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -7,9 +8,9 @@ from django.urls import reverse, reverse_lazy
 # TODO czy często się robi tak jak w 2 poniższych liniach (podwójny import)?
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from catalog.forms import RenewBookForm, BookInstanceReturnForm, BookInstanceBorrowForm, BookInstanceReserveForm
+from catalog.forms import RenewBookForm, BookInstanceReturnForm, BookInstanceChangeStatusForm, BookInstanceBorrowForm, \
+    BookInstanceReserveForm
 from catalog.models import Author, Book, BookInstance, Genre
-
 
 
 def index(request):
@@ -169,16 +170,19 @@ class BookInstanceReturn(PermissionRequiredMixin, LoginRequiredMixin, UpdateView
 
 
 class BookInstanceCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
-    permission_required = 'catalog.add_book'
+    permission_required = 'catalog.add_bookinstance'
     template_name = 'bookinstance_form.html'
     model = BookInstance
+    fields = '__all__'
+    # initial = {'id_book': request.book.id}
     # success_url = reverse_lazy('book_detail.html')
 
 
 class BookInstanceUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
-    permission_required = 'catalog.change_book'
+    permission_required = 'catalog.change_bookinstance'
     template_name = 'bookinstance_form.html'
     model = BookInstance
+    fields = '__all__'
     # success_url = reverse_lazy('book_detail.html')
 
 
@@ -189,18 +193,27 @@ class BookInstanceDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView
     success_url = reverse_lazy('book_detail.html')
 
 
-class BookInstanceChangeStatus(LoginRequiredMixin, UpdateView):
+class BookInstanceChangeStatus(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'catalog.can_mark_returned'
     template_name = 'bookinstance_form.html'
     model = BookInstance
-#     form_class = BookInstanceChangeStatusForm
+    form_class = BookInstanceChangeStatusForm
     success_url = reverse_lazy('all_borrowed')
-# TODO stworzę formularz
+
 
 class BookInstanceBorrow(LoginRequiredMixin, UpdateView):
     template_name = 'bookinstance_form.html'
     model = BookInstance
     form_class = BookInstanceBorrowForm
     success_url = reverse_lazy('my_borrowed')
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # Add in a QuerySet of all the books
+        context['user'] = self.request.user
+        return context
+
 
 class BookInstanceReserve(LoginRequiredMixin, UpdateView):
     template_name = 'bookinstance_form.html'

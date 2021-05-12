@@ -5,14 +5,15 @@
 <h2><a href="{% url 'book_detail' bookinstance.book.id %}" class="link-primary">{{bookinstance.book.title}}</a></h2>
 <h3>{{bookinstance.id}}</h3>
 {% if user.is_authenticated %}
-<a href="{% url 'change_book_copy' %}">Zmień status</a>
-<a href="{% url 'borrow_book_copy'" %}">Wypożycz</a>
+    <a href="{% url 'borrow_book' bookinstance.id %}">Wypożycz</a>
+    <a href="{% url 'reserve_book' bookinstance.id %}">Zarezerwuj</a>
+{% if perms.catalog.change_bookinstance %}
+<a href="{% url 'change_book_copy_status' bookinstance.id %}">Zmień status</a>
+<a href="{% url 'change_book_copy' bookinstance.id %}">Edytuj kopię książki</a>
 {% endif %}
-{% if perms.catalog.change_book %}
-<a href="{% url 'change_book_copy' %}">Edytuj kopię książki</a>
+{% if perms.catalog.delete_bookinstance %}
+<a href="{% url 'delete_book_copy' bookinstance.id %}">Usuń kopię książki</a>
 {% endif %}
-{% if perms.catalog.delete_book %}
-<a href="{% url 'delete_book_copy' %}">Usuń kopię książki</a>
 {% endif %}
 
 {% endblock %}

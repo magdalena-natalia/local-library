@@ -28,7 +28,6 @@ class BookInstanceReturnForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         userless_choices = [('a', 'Dostępna'), ('m', 'W trakcie renowacji')]
         self.fields['status'].choices = userless_choices
-        # self.fields['status'].default = 'a'
 
         # if the form submitted and the model instance exists,
         # clean the book instance borrower in the database
@@ -36,17 +35,6 @@ class BookInstanceReturnForm(forms.ModelForm):
             self.instance.borrower = None
             self.instance.save()
 
-
-class BookInstanceReserveForm(forms.ModelForm):
-    class Meta:
-        model = BookInstance
-        fields = ['status', 'borrower']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
-        self.fields['status'].choices = status_choices
-        self.fields['borrower'].queryset = User.objects.filter(user=self.request.user)
 
 class BookInstanceChangeStatusForm(forms.ModelForm):
     class Meta:
@@ -58,14 +46,14 @@ class BookInstanceChangeStatusForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
-        self.fields['status'].choices = status_choices
-        self.fields['borrower'].queryset = User.objects.filter(user=self.request.user)
-        # self.fields['borrower'].empty_label = None
+        self.fields['borrower'].empty_label = None
+
+        if self.is_bound and self.fields['status']==(('a', 'Dostępna') or ('m', 'W trakcie renowacji')):
+            self.instance.borrower = None
+            self.instance.save()
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['status'] = 'r'
         initial['due_back'] = date.today() + timedelta(days=30)
         return initial
 
@@ -79,6 +67,31 @@ class BookInstanceChangeStatusForm(forms.ModelForm):
             raise ValidationError(_('Książke można wypozyczyc na nie więcej niż 31 dni'))
         return data
 
+
 class BookInstanceBorrowForm(BookInstanceChangeStatusForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.user=user
+        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
+        self.fields['status'].choices = status_choices
+        self.fields['borrower'].queryset = User.objects.filter(username=user)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = 'o'
+        return initial
+
+
+class BookInstanceReserveForm(BookInstanceChangeStatusForm):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
+        self.fields['status'].choices = status_choices
+        self.fields['borrower'].queryset = User.objects.filter(username=user)
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = 'r'
+        return initial
+

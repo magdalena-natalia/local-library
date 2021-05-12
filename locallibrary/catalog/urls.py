@@ -9,7 +9,7 @@ urlpatterns = [
     # re_path(r'^book/(?P<pk>\d+)$', views.BookDetailView.as_view(), name='book-detail'),
     # lub:
     path('book/<int:pk>/', views.BookDetailView.as_view(), name='book_detail'),
-    path('book/create/', views.BookCreate.as_view(),name='book_create'),
+    path('book/create/', views.BookCreate.as_view(), name='book_create'),
     path('book/<int:pk>/update/', views.BookUpdate.as_view(), name='book_update'),
     path('book/<int:pk>/delete/', views.BookDelete.as_view(), name='book_delete'),
 
@@ -19,9 +19,10 @@ urlpatterns = [
     path('book-copy/renew/<uuid:pk>/', views.renew_book, name='renew_book'),
     path('book-copy/return/<uuid:pk>/', views.BookInstanceReturn.as_view(), name='return_book'),
     path('book-copy/borrow/<uuid:pk>/', views.BookInstanceBorrow.as_view(), name='borrow_book'),
-    path('book-copy/change_status/<uuid:pk>/', views.BookInstanceChangeStatus.as_view(), name='change_book_copy_status'),
-    path('book-copy/reserve/<uuid:pk>/', views.BookInstanceReserve.as_view(), name='reserve_book_copy'),
-    path('book-copy/add/<uuid:pk>/', views.BookInstanceCreate.as_view(), name='add_book_copy'),
+    path('book-copy/change_status/<uuid:pk>/', views.BookInstanceChangeStatus.as_view(),
+         name='change_book_copy_status'),
+    path('book-copy/reserve/<uuid:pk>/', views.BookInstanceReserve.as_view(), name='reserve_book'),
+    path('book-copy/add/<int:pk>/', views.BookInstanceCreate.as_view(), name='add_book_copy'),
     path('book-copy/update/<uuid:pk>/', views.BookInstanceUpdate.as_view(), name='update_book_copy'),
     path('book-copy/delete/<uuid:pk>/', views.BookInstanceDelete.as_view(), name='delete_book_copy'),
 

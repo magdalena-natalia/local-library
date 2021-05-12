@@ -16,7 +16,8 @@
     {% for bookinstance in bookinstance_list %}
     <tr>
         <td>
-            <a href="{% url 'book_detail' bookinstance.book.pk %}" class="font-weight-bold">{{bookinstance.book.title}}</a>
+            <a href="{% url 'book_detail' bookinstance.book.pk %}"
+               class="font-weight-bold">{{bookinstance.book.title}}</a>
         </td>
         <td>
             &nbsp;&nbsp;&nbsp;&nbsp;{{ bookinstance.borrower }}
@@ -26,12 +27,14 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;{{ bookinstance.due_back|date:'d. m. Y' }} </span>
         </td>
         <td>
-            &nbsp;&nbsp;&nbsp;&nbsp;{% if not bookinstance.prolonged %}<a href="{% url 'renew_book' bookinstance.id %}">Przedłuż</a>{% else %}Brak możliwości{% endif %}
+            &nbsp;&nbsp;&nbsp;&nbsp;{% if not bookinstance.prolonged %}<a href="{% url 'renew_book' bookinstance.id %}">Przedłuż</a>
+            {%else %}
+            Brak możliwości
+            {% endif %}
         </td>
         <td>
             &nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'return_book' bookinstance.id%}">Zatwierdź</a>
         </td>
-    </tr>
     {% endfor %}
 </table>
 
