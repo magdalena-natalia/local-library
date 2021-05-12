@@ -7,8 +7,9 @@ from django.urls import reverse, reverse_lazy
 # TODO czy często się robi tak jak w 2 poniższych liniach (podwójny import)?
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from catalog.forms import RenewBookForm, BookInstanceReturnForm
+from catalog.forms import RenewBookForm, BookInstanceReturnForm, BookInstanceBorrowForm, BookInstanceReserveForm
 from catalog.models import Author, Book, BookInstance, Genre
+
 
 
 def index(request):
@@ -167,3 +168,42 @@ class BookInstanceReturn(PermissionRequiredMixin, LoginRequiredMixin, UpdateView
     success_url = reverse_lazy('all_borrowed')
 
 
+class BookInstanceCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = 'catalog.add_book'
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+    # success_url = reverse_lazy('book_detail.html')
+
+
+class BookInstanceUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = 'catalog.change_book'
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+    # success_url = reverse_lazy('book_detail.html')
+
+
+class BookInstanceDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    permission_required = 'catalog.delete_book'
+    template_name = 'bookinstance_confirm_delete.html'
+    model = BookInstance
+    success_url = reverse_lazy('book_detail.html')
+
+
+class BookInstanceChangeStatus(LoginRequiredMixin, UpdateView):
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+#     form_class = BookInstanceChangeStatusForm
+    success_url = reverse_lazy('all_borrowed')
+# TODO stworzę formularz
+
+class BookInstanceBorrow(LoginRequiredMixin, UpdateView):
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+    form_class = BookInstanceBorrowForm
+    success_url = reverse_lazy('my_borrowed')
+
+class BookInstanceReserve(LoginRequiredMixin, UpdateView):
+    template_name = 'bookinstance_form.html'
+    model = BookInstance
+    form_class = BookInstanceReserveForm
+    success_url = reverse_lazy('my_borrowed')

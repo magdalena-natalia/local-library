@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from django import forms
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from catalog.models import BookInstance
@@ -34,3 +35,50 @@ class BookInstanceReturnForm(forms.ModelForm):
         if self.is_bound and self.instance.pk:
             self.instance.borrower = None
             self.instance.save()
+
+
+class BookInstanceReserveForm(forms.ModelForm):
+    class Meta:
+        model = BookInstance
+        fields = ['status', 'borrower']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
+        self.fields['status'].choices = status_choices
+        self.fields['borrower'].queryset = User.objects.filter(user=self.request.user)
+
+class BookInstanceChangeStatusForm(forms.ModelForm):
+    class Meta:
+        model = BookInstance
+        fields = ['status', 'borrower', 'due_back']
+        # TODO co robia te podkreślniki tutaj?
+        labels = {'borrower': _('Użytkownik'), 'due_back': _('Maksymalna data zwrotu')}
+        help_texts = {'due_back': _('Wprowadz date w zakresie od dzis do 31 dni dni (domyslnie 30 dni od dzis.')}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        status_choices = [('r', 'Zarezerwuj'), ('o', 'Wypożycz')]
+        self.fields['status'].choices = status_choices
+        self.fields['borrower'].queryset = User.objects.filter(user=self.request.user)
+        # self.fields['borrower'].empty_label = None
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = 'r'
+        initial['due_back'] = date.today() + timedelta(days=30)
+        return initial
+
+    def clean_due_back(self):
+        data = self.cleaned_data['due_back']
+
+        if data < date.today():
+            raise ValidationError(_('Niepoprawna data - data z przeszłości'))
+
+        if data > date.today() + timedelta(days=31):
+            raise ValidationError(_('Książke można wypozyczyc na nie więcej niż 31 dni'))
+        return data
+
+class BookInstanceBorrowForm(BookInstanceChangeStatusForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
