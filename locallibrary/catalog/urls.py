@@ -23,8 +23,8 @@ urlpatterns = [
          name='change_book_copy_status'),
     path('book-copy/reserve/<uuid:pk>/', views.BookInstanceReserve.as_view(), name='reserve_book'),
     path('book-copy/add/<int:pk>/', views.BookInstanceCreate.as_view(), name='add_book_copy'),
-    path('book-copy/update/<uuid:pk>/', views.BookInstanceUpdate.as_view(), name='update_book_copy'),
-    path('book-copy/delete/<uuid:pk>/', views.BookInstanceDelete.as_view(), name='delete_book_copy'),
+    path('book-copy/update/<uuid:pk>&<int:book_pk>/', views.BookInstanceUpdate.as_view(), name='update_book_copy'),
+    path('book-copy/delete/<uuid:pk>&<int:book_pk>/', views.BookInstanceDelete.as_view(), name='delete_book_copy'),
 
     # Authors
     path('authors/', views.AuthorListView.as_view(), name='authors'),

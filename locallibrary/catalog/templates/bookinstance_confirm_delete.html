@@ -1,8 +1,9 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<h1>Usuwanie książki</h1>
-<p>Książka <strong>{{ book }}</strong> została przeznaczona do usunięcia.
+<h1>Usuwanie kopii książki</h1>
+<p>Książka: <strong>{{ bookinstance.book.title}}</strong> o ID: <strong>{{bookinstance.id }}</strong>
+    została przeznaczona do usunięcia.
     <br>
     Czy na pewno usunąć książkę?</p>
 <form action="" method="post">

@@ -42,11 +42,11 @@ TODO dodaj przecinki
     <a href="{% url 'reserve_book' copy.id %}">Zarezerwuj</a>
 
     {% if perms.catalog.change_bookinstance %}
-    <a href="{% url 'update_book_copy' copy.id %}">Edytuj kopię książki</a>
+    <a href="{% url 'update_book_copy' copy.id book.id  %}">Edytuj kopię książki</a>
     <a href="{% url 'change_book_copy_status' copy.id %}">Zmień status</a>
     {% endif %}
     {% if perms.catalog.delete_bookinstance %}
-    <a href="{% url 'delete_book_copy' copy.id %}">Usuń kopię książki</a>
+    <a href="{% url 'delete_book_copy' copy.id book.id %}">Usuń kopię książki</a>
     {% endif %}
     {% endif %}
     {% endfor %}

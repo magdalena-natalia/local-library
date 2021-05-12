@@ -174,8 +174,16 @@ class BookInstanceCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView
     template_name = 'bookinstance_form.html'
     model = BookInstance
     fields = '__all__'
-    # initial = {'id_book': request.book.id}
-    # success_url = reverse_lazy('book_detail.html')
+
+    def get_success_url(self):
+        return reverse_lazy('book_detail', kwargs={'pk': self.kwargs.get("pk")})
+
+    def get_initial(self):
+        self.book = Book.objects.get(pk=self.kwargs.get("pk"))
+        return {
+            "status": "a",
+            "book": self.book
+        }
 
 
 class BookInstanceUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -183,14 +191,33 @@ class BookInstanceUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView
     template_name = 'bookinstance_form.html'
     model = BookInstance
     fields = '__all__'
-    # success_url = reverse_lazy('book_detail.html')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['book_title'] = self.kwargs.get('book_title')
+        context['book_pk'] = self.kwargs.get('book_pk')
+        context['pk'] = self.kwargs.get('pk')
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('book_detail', kwargs={'pk': self.kwargs.get("book_pk")})
 
 
 class BookInstanceDelete(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     permission_required = 'catalog.delete_book'
     template_name = 'bookinstance_confirm_delete.html'
     model = BookInstance
-    success_url = reverse_lazy('book_detail.html')
+
+    # TODO Skąd wiesz, jakich kluczy użyć?
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['book_title'] = self.kwargs.get('book_title')
+        context['book_pk'] = self.kwargs.get('book_pk')
+        context['pk'] = self.kwargs.get('pk')
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('book_detail', kwargs={'pk': self.kwargs.get("book_pk")})
 
 
 class BookInstanceChangeStatus(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
@@ -199,6 +226,16 @@ class BookInstanceChangeStatus(PermissionRequiredMixin, LoginRequiredMixin, Upda
     model = BookInstance
     form_class = BookInstanceChangeStatusForm
     success_url = reverse_lazy('all_borrowed')
+    initial = {'due_back': date.today() + timedelta(days=30)}
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        if form.cleaned_data['status'] == 'a' or form.cleaned_data['status'] == 'm':
+            self.object.due_back = None
+            self.object.borrower = None
+            self.object.save()
+        return super().form_valid(form)
 
 
 class BookInstanceBorrow(LoginRequiredMixin, UpdateView):
@@ -207,12 +244,12 @@ class BookInstanceBorrow(LoginRequiredMixin, UpdateView):
     form_class = BookInstanceBorrowForm
     success_url = reverse_lazy('my_borrowed')
 
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super().get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
-        context['user'] = self.request.user
-        return context
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = 'o'
+        initial['borrower'] = self.request.user
+        initial['due_back'] = date.today() + timedelta(days=30)
+        return initial
 
 
 class BookInstanceReserve(LoginRequiredMixin, UpdateView):
@@ -220,3 +257,10 @@ class BookInstanceReserve(LoginRequiredMixin, UpdateView):
     model = BookInstance
     form_class = BookInstanceReserveForm
     success_url = reverse_lazy('my_borrowed')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['status'] = 'r'
+        initial['borrower'] = self.request.user
+        initial['due_back'] = date.today() + timedelta(days=30)
+        return initial

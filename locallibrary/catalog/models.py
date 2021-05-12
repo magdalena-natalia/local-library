@@ -126,7 +126,6 @@ class BookInstance(models.Model):
     status = models.CharField(
         max_length=1,
         choices=LOAN_STATUS,
-        blank=True,
         default='a',
         verbose_name='Dostępność książki',
     )
